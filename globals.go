@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/faiface/glhf"
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/ojrac/opensimplex-go"
+	"math/rand"
 	"time"
 
 	"./shape"
@@ -19,6 +21,8 @@ var (
 	deltaTime = 0.0
 	lastFrame = 0.0
 
+	seed = opensimplex.New32(rand.Int63())
+
 	vertexFormat = glhf.AttrFormat{
 		{"position", glhf.Vec3},
 		{"texture", glhf.Vec2},
@@ -29,7 +33,7 @@ var (
 	firstMouse = true
 
 	globalCamera Utils.Camera
-	oldChunkPos = mgl32.Vec2{0, 0}
+	chunks []shape.Chunk
 	chunkPos = mgl32.Vec2{}
 	cube shape.Cube
 

@@ -18,15 +18,16 @@ func trunc(val float32) float32 {
 	return float32(math.Round(float64(val)))
 }
 
+//TODO include the y axis
 func GenerateChunkAroundPlayer(camera Utils.Camera, cube *Cube, pos mgl32.Vec2, seed opensimplex.Noise32) []Chunk {
 	chunks := []Chunk{}
 
 	a := float32(camera.Yaw - 90)
-	for di := float32(0); di <= 4; di++ {
+	for di := float32(1); di <= 4; di++ {
 		d := mgl32.Rotate2D(mgl32.DegToRad(a)).Mul2x1(mgl32.Vec2{0, di})
 
-		rX := mgl32.Rotate2D(mgl32.DegToRad(55)).Mul2x1(d).Add(pos)
-		lX := mgl32.Rotate2D(mgl32.DegToRad(-55)).Mul2x1(d).Add(pos)
+		rX := mgl32.Rotate2D(mgl32.DegToRad(45)).Mul2x1(d).Add(pos)
+		lX := mgl32.Rotate2D(mgl32.DegToRad(-45)).Mul2x1(d).Add(pos)
 
 		chunks = append(chunks, GenerateChunk(pos, cube, seed))
 		var mm mgl32.Vec2
@@ -59,13 +60,11 @@ func GenerateChunk(pos mgl32.Vec2, cube *Cube, seed opensimplex.Noise32) Chunk {
 		16,
 	}
 
-	div := float32(32)
-
-	c.blockPositions = append(c.blockPositions, mgl32.Vec3{pos.X() * c.size, -1.0, pos.Y() * c.size})
+	div := float32(64)
 
 	for x := pos.X() * c.size - c.size / 2; x < pos.X() * c.size + c.size / 2; x++ {
 		for z := pos.Y() * c.size - c.size / 2; z < pos.Y() * c.size + c.size / 2; z++ {
-			y := float32(math.Floor(float64(seed.Eval2(x / div, z / div) * 16)))
+			y := float32(math.Floor(float64(seed.Eval2(x / div, z / div) * c.size)))
 			c.blockPositions = append(c.blockPositions, mgl32.Vec3{x, y, z})
 		}
 	}

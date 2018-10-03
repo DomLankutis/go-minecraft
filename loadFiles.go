@@ -6,12 +6,12 @@ import (
 
 func loadFiles() error {
 	var err error
-	vertexShader, err = eUtils.ReadFile("./shaders/vertexShader.vertexshader")
+	vertexShader, err = eUtils.ReadFile("./shaders/vertexShader.glsl")
 	if err != nil {
 		return err
 	}
 
-	fragmentShader, err = eUtils.ReadFile("./shaders/fragmentShader.fragmentshader")
+	fragmentShader, err = eUtils.ReadFile("./shaders/fragmentShader.glsl")
 	if err != nil {
 		return err
 	}
