@@ -1,19 +1,25 @@
 package main
 
 import (
+	"./glhf"
 	"fmt"
-	"github.com/faiface/glhf"
 	"github.com/faiface/mainthread"
 	"github.com/go-gl/glfw/v3.1/glfw"
 	"github.com/go-gl/mathgl/mgl32"
+	"github.com/ojrac/opensimplex-go"
+	"math/rand"
 	"time"
 
-	"./Utils"
-	"./shape"
+	"./utils"
+	"./world"
 )
 
 func run() {
 	tick := time.Tick(time.Second)
+
+	rand.Seed(time.Now().UnixNano())
+	seed = opensimplex.New32(rand.Int63())
+
 	var win *glfw.Window
 
 	defer func() {
@@ -32,8 +38,9 @@ func run() {
 		glfw.WindowHint(glfw.DoubleBuffer, 0)
 		glfw.WindowHint(glfw.Resizable, glfw.False)
 
+
 		var err error
-		win, err = glfw.CreateWindow(WIDTH, HEIGHT, "test", nil, nil)
+		win, err = glfw.CreateWindow(WIDTH, HEIGHT, "BtecCraft", nil, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -46,20 +53,22 @@ func run() {
 	})
 
 	mainthread.Call(func() {
-		shader, err := glhf.NewShader(vertexFormat, glhf.AttrFormat{
-			{"colorHue", glhf.Vec4},
+		var err error
+		shader, err = glhf.NewShader(vertexFormat, glhf.AttrFormat{
 			{"MVP", glhf.Mat4},
 		}, vertexShader, fragmentShader)
 		if err != nil {
 			panic(err)
 		}
 
-		texture := glhf.NewTexture(testImg.Bounds().Dx(), testImg.Bounds().Dy(),
-			false, testImg.Pix,)
+		texture = glhf.NewTexture(testImg.Bounds().Dx(), testImg.Bounds().Dy(),
+		false, testImg.Pix,)
 
-		cube = shape.NewCube(shader, texture, 16, mgl32.Vec2{0, 0})
+		globalCamera = utils.InitCamera(WIDTH, HEIGHT, shader)
 
-		globalCamera = Utils.InitCamera(WIDTH, HEIGHT, shader)
+		grass := world.NewCube(shader, texture, mgl32.Vec2{0}, [6]bool{})
+
+		chunkRender = NewChunkRender(grass, seed, &globalCamera, shader, texture)
 	})
 
 	shouldClose := false
@@ -73,20 +82,19 @@ func run() {
 			deltaTime = currentTime - lastFrame
 			lastFrame = currentTime
 
-			glhf.Clear(0.2, 0.4, 1, 1)
+			glhf.Clear(0.0, 0.4, 0.8, 1)
+
 
 			processInput(win)
+			globalCamera.Update()
 
-			go globalCamera.Update()
-			chunks = shape.GenerateChunkAroundPlayer(globalCamera, &cube, chunkPos, seed)
+			chunkRender.GetVisibleChunks(4)
+			chunkRender.Draw()
 
-			for _, chunk := range chunks {
-				chunk.Draw(globalCamera)
-			}
 			win.SwapBuffers()
 			glfw.PollEvents()
 
-			<-frameRate
+			//<-frameRate
 			frames++
 			select {
 			case <- tick:

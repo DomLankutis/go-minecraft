@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/faiface/glhf"
-	"github.com/go-gl/mathgl/mgl32"
+	"./glhf"
+	"./utils"
+	"./world"
+
 	"github.com/ojrac/opensimplex-go"
-	"math/rand"
 	"time"
 
-	"./shape"
-	"./Utils"
 	"image"
 )
 
@@ -20,22 +19,23 @@ var (
 	frames = 0
 	deltaTime = 0.0
 	lastFrame = 0.0
-
-	seed = opensimplex.New32(rand.Int63())
+	seed opensimplex.Noise32
 
 	vertexFormat = glhf.AttrFormat{
 		{"position", glhf.Vec3},
 		{"texture", glhf.Vec2},
 	}
+	shader *glhf.Shader
+	texture *glhf.Texture
 
 	testImg *image.NRGBA
 
 	firstMouse = true
 
-	globalCamera Utils.Camera
-	chunks []shape.Chunk
-	chunkPos = mgl32.Vec2{}
-	cube shape.Cube
+	globalCamera utils.Camera
+
+	chunkRender ChunkRender
+	chunk world.Chunk
 
 	vertexShader string
 	fragmentShader string

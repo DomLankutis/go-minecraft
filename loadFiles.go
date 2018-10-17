@@ -1,22 +1,22 @@
 package main
 
 import (
-	"./eUtils"
+	"./utils"
 )
 
 func loadFiles() error {
 	var err error
-	vertexShader, err = eUtils.ReadFile("./shaders/vertexShader.glsl")
+	vertexShader, err = utils.ReadFile("./shaders/vertexShader.glsl")
 	if err != nil {
 		return err
 	}
 
-	fragmentShader, err = eUtils.ReadFile("./shaders/fragmentShader.glsl")
+	fragmentShader, err = utils.ReadFile("./shaders/fragmentShader.glsl")
 	if err != nil {
 		return err
 	}
 
-	testImg, err = eUtils.LoadImage("./textures/grass.png")
+	testImg, err = utils.LoadImage("./textures/grass.png")
 	if err != nil {
 		return err
 	}

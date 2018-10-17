@@ -49,6 +49,4 @@ func processInput(window *glfw.Window) {
 	if window.GetKey(glfw.KeyA) == glfw.Press {
 		globalCamera.CamPosition = globalCamera.CamPosition.Sub(mgl32.Vec3.Normalize(globalCamera.CamFront.Cross(mgl32.Vec3{0, 1, 0})).Mul(camSpeed))
 	}
-
-	chunkPos = mgl32.Vec2{float32(math.Round(float64(globalCamera.CamPosition.X()) / 16)), float32(math.Round(float64(globalCamera.CamPosition.Z() / 16)))}
 }
