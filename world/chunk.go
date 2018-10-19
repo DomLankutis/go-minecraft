@@ -7,22 +7,22 @@ import (
 	"github.com/ojrac/opensimplex-go"
 )
 
-func left(vec3 mgl32.Vec3) mgl32.Vec3{
+func left(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X() - 1, vec3.Y(), vec3.Z()}
 }
-func right(vec3 mgl32.Vec3) mgl32.Vec3{
+func right(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X() + 1, vec3.Y(), vec3.Z()}
 }
-func top(vec3 mgl32.Vec3) mgl32.Vec3{
+func top(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X(), vec3.Y() + 1, vec3.Z()}
 }
-func bottom(vec3 mgl32.Vec3) mgl32.Vec3{
+func bottom(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X(), vec3.Y() - 1, vec3.Z()}
 }
-func back(vec3 mgl32.Vec3) mgl32.Vec3{
+func back(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X(), vec3.Y(), vec3.Z() - 1}
 }
-func front(vec3 mgl32.Vec3) mgl32.Vec3{
+func front(vec3 mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.Vec3{vec3.X(), vec3.Y(), vec3.Z() + 1}
 }
 
@@ -34,7 +34,7 @@ type Chunk struct {
 	IsChanged bool
 }
 
-func NewChunk(cube *Cube) Chunk{
+func NewChunk(cube *Cube) Chunk {
 	return Chunk{
 		cube,
 		map[mgl32.Vec3]*Cube{},
@@ -44,8 +44,27 @@ func NewChunk(cube *Cube) Chunk{
 	}
 }
 
+func (c *Chunk) BlockExistsAt(pos mgl32.Vec3) bool {
+	return c.blocks[pos] != nil
+}
+
+func (c *Chunk) DestroyBlockAt(pos mgl32.Vec3) {
+	if c.BlockExistsAt(pos) {
+		delete(c.blocks, pos)
+		c.IsChanged = true
+	}
+}
+
+func (c *Chunk) CreateBlockAt(pos mgl32.Vec3) {
+	if !c.BlockExistsAt(pos) {
+		c.blocks[pos] = c.cube
+		c.IsChanged = true
+	}
+}
+
 func (c *Chunk) UpdateMesh() {
 	if c.IsChanged {
+		c.drawable = map[mgl32.Vec3]*Cube{}
 		for pos := range c.blocks {
 			faces := [6]bool{false, false, false, false, false, false}
 			add := false
@@ -81,7 +100,7 @@ func (c *Chunk) UpdateMesh() {
 	c.IsChanged = false
 }
 
-func GenerateChunkAt(seed opensimplex.Noise32, vec2 mgl32.Vec2, cube *Cube, shader *glhf.Shader, texture *glhf.Texture) *Chunk {
+func GenerateChunkAt(seed opensimplex.Noise32, vec2 mgl32.Vec2, cube *Cube) *Chunk {
 	c := NewChunk(cube)
 
 	div := float32(16 * 4)
@@ -91,13 +110,13 @@ func GenerateChunkAt(seed opensimplex.Noise32, vec2 mgl32.Vec2, cube *Cube, shad
 	endZ := startZ + c.Size
 	var pos mgl32.Vec3
 	for x := startX; x <= endX; x++ {
-	for z := startZ; z <= endZ; z++ {
-		y := float32(int(seed.Eval2(x/div, z/div) * c.Size))
-		for yy := float32(-16); yy <= y; yy++ {
-			pos = mgl32.Vec3{x, yy, z}
-			c.blocks[pos] = c.cube
+		for z := startZ; z <= endZ; z++ {
+			y := float32(int(seed.Eval2(x/div, z/div) * c.Size))
+			for yy := float32(-16); yy <= y; yy++ {
+				pos = mgl32.Vec3{x, yy, z}
+				c.blocks[pos] = c.cube
+			}
 		}
-	}
 	}
 
 	return &c
