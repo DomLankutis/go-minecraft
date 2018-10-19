@@ -19,10 +19,10 @@ func (f *Frustum) ContainsPoint(p mgl32.Vec3) bool {
 
 func (f *Frustum) ContainsChunk(pos mgl32.Vec3, size float32) bool {
 	points := []mgl32.Vec3{
-		mgl32.Vec3{pos.X(), 0, pos.Z()},
-		mgl32.Vec3{pos.X() + size, 0, pos.Z() + size},
-		mgl32.Vec3{pos.X() + size, 0, pos.Z()},
-		mgl32.Vec3{pos.X(), 0, pos.Z() + size},
+		{pos.X(), 0, pos.Z()},
+		{pos.X() + size, 0, pos.Z() + size},
+		{pos.X() + size, 0, pos.Z()},
+		{pos.X(), 0, pos.Z() + size},
 	}
 
 	in := 0
@@ -46,16 +46,16 @@ func (f *Frustum) Update(mat4 mgl32.Mat4) {
 	}
 }
 
-func GenFrustum(c *Camera) Frustum{
+func GenFrustum(c *Camera) Frustum {
 	c1, c2, c3, c4 := c.GetProjection().Mul4(c.GetView()).Rows()
 	return Frustum{
 		planes: []mgl32.Vec4{
-			c4.Add(c1),          	// left
-			c4.Sub(c1),          	// right
-			c4.Sub(c2),          	// top
-			c4.Add(c2),          	// bottom
-			c4.Mul(0.1).Add(c3), 	// front
-			c4.Mul(100).Sub(c3), 	// back
+			c4.Add(c1),          // left
+			c4.Sub(c1),          // right
+			c4.Sub(c2),          // top
+			c4.Add(c2),          // bottom
+			c4.Mul(0.1).Add(c3), // front
+			c4.Mul(100).Sub(c3), // back
 		},
 	}
 }
