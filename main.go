@@ -18,7 +18,7 @@ func run() {
 	tick := time.Tick(time.Second)
 
 	rand.Seed(time.Now().UnixNano())
-	seed = opensimplex.New32(rand.Int63())
+	SEED = opensimplex.New32(rand.Int63())
 
 	var win *glfw.Window
 
@@ -38,7 +38,6 @@ func run() {
 		glfw.WindowHint(glfw.DoubleBuffer, 0)
 		glfw.WindowHint(glfw.Resizable, glfw.False)
 
-
 		var err error
 		win, err = glfw.CreateWindow(WIDTH, HEIGHT, "BtecCraft", nil, nil)
 		if err != nil {
@@ -54,21 +53,21 @@ func run() {
 
 	mainthread.Call(func() {
 		var err error
-		shader, err = glhf.NewShader(vertexFormat, glhf.AttrFormat{
+		SHADER, err = glhf.NewShader(VERTEXFORMAT, glhf.AttrFormat{
 			{"MVP", glhf.Mat4},
-		}, vertexShader, fragmentShader)
+		}, VERTEXSHADER, FRAGMENTSHADER)
 		if err != nil {
 			panic(err)
 		}
 
-		texture = glhf.NewTexture(testImg.Bounds().Dx(), testImg.Bounds().Dy(),
-		false, testImg.Pix,)
+		texture = glhf.NewTexture(TEXTUREATLAS.Bounds().Dx(), TEXTUREATLAS.Bounds().Dy(),
+			false, TEXTUREATLAS.Pix)
 
-		globalCamera = utils.InitCamera(WIDTH, HEIGHT, shader)
+		GLOBALCAMERA = utils.InitCamera(WIDTH, HEIGHT, SHADER)
 
-		grass := world.NewCube(shader, texture, mgl32.Vec2{0}, [6]bool{})
+		grass := world.NewCube(SHADER, texture, mgl32.Vec2{0}, [6]bool{})
 
-		chunkRender = NewChunkRender(grass, seed, &globalCamera, shader, texture)
+		CHUNKRENDERER = NewChunkRender(grass, SEED, &GLOBALCAMERA, SHADER, texture)
 	})
 
 	shouldClose := false
@@ -79,34 +78,33 @@ func run() {
 			}
 
 			currentTime := glfw.GetTime()
-			deltaTime = currentTime - lastFrame
-			lastFrame = currentTime
+			DELTATIME = currentTime - LASTFRAME
+			LASTFRAME = currentTime
 
 			glhf.Clear(0.0, 0.4, 0.8, 1)
 
-
 			processInput(win)
-			globalCamera.Update()
+			GLOBALCAMERA.Update()
 
-			chunkRender.GetVisibleChunks(4)
-			chunkRender.Draw()
+			CHUNKRENDERER.GetVisibleChunks(4)
+			CHUNKRENDERER.Draw()
 
 			win.SwapBuffers()
 			glfw.PollEvents()
 
-			//<-frameRate
-			frames++
+			//<-FRAMERATE
+			FRAMES++
 			select {
-			case <- tick:
-				win.SetTitle(fmt.Sprintf("FPS: %v | DT: %v", frames, deltaTime))
-				frames = 0
+			case <-tick:
+				win.SetTitle(fmt.Sprintf("FPS: %v | DT: %v", FRAMES, DELTATIME))
+				FRAMES = 0
 			default:
 			}
 		})
 	}
 }
 
-func main () {
+func main() {
 	if err := loadFiles(); err != nil {
 		panic(err)
 	}
