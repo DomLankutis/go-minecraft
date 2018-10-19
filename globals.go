@@ -12,32 +12,34 @@ import (
 )
 
 var (
-	WIDTH = 1920
+	WIDTH  = 1920
 	HEIGHT = 1080
 
-	frameRate = time.Tick(time.Second/144)
-	frames = 0
-	deltaTime = 0.0
-	lastFrame = 0.0
-	seed opensimplex.Noise32
+	FRAMERATE = time.Tick(time.Second / 144)
+	FRAMES    = 0
+	DELTATIME = 0.0
+	LASTFRAME = 0.0
 
-	vertexFormat = glhf.AttrFormat{
+	MOUSESTATE = 0
+
+	SEED opensimplex.Noise32
+
+	VERTEXFORMAT = glhf.AttrFormat{
 		{"position", glhf.Vec3},
 		{"texture", glhf.Vec2},
 	}
-	shader *glhf.Shader
+	SHADER  *glhf.Shader
 	texture *glhf.Texture
 
-	testImg *image.NRGBA
+	TEXTUREATLAS *image.NRGBA
 
-	firstMouse = true
+	FIRSTMOUSE = true
 
-	globalCamera utils.Camera
+	GLOBALCAMERA utils.Camera
 
-	chunkRender ChunkRender
-	chunk world.Chunk
+	CHUNKRENDERER ChunkRender
+	CHUNK         world.Chunk
 
-	vertexShader string
-	fragmentShader string
+	VERTEXSHADER   string
+	FRAGMENTSHADER string
 )
-
